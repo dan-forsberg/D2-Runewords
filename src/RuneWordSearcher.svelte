@@ -18,7 +18,15 @@
     }
 </script>
 
-<input type="text" bind:value={searchString} on:input={search} />
+<label>
+    Search term(s):
+    <input type="text" bind:value={searchString} on:input={search} /> <br />
+    Prefix terms with ' for, eg
+    <code><em>'fire 'cold 'resist</em></code>
+    will find words that includes "fire", "cold" and "resist" in the effects
+    <a href="https://fusejs.io/examples.html#extended-search">more info</a>
+</label>
+<hr />
 <div id="results">
     {#each results as runeword}
         <RuneWord {runeword} />
