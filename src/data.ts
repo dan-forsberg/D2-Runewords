@@ -1118,5 +1118,31 @@ const data: Runeword[] = [
     }
 ];
 
+const types: string[] = [
+    "off-hand armor shields",
+    "shrunken heads",
+    "paladin shields",
+    "weapons",
+    "axes",
+    "scepters",
+    "hammers",
+    "missile weapons bows",
+    "crossbows",
+    "amazon bows",
+    "polearms",
+    "swords",
+    "body armor",
+    "clubs",
+    "maces",
+    "katars",
+    "melee weapons",
+    "helms including barbarian helms",
+    "druid pelts",
+    "circlets",
+    "staves",
+    "paladin-only items paladin shields",
+    "wands"
+];
 
-export { data, Runeword };
+
+export { data, Runeword, types };
