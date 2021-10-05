@@ -6,12 +6,16 @@
     let { runeword: name, effects, level, item, ladderOnly } = runeword;
 
     if (highlight.length !== 0) {
-        const search = new RegExp(highlight, "gi");
+        const search = new RegExp(escapeRegExp(highlight), "gi");
         const replace = "<span class='highlight'>$&</span>";
 
         name = name.replace(search, replace);
         effects = effects.replace(search, replace);
         item = item.replace(search, replace);
+    }
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
     }
 </script>
 

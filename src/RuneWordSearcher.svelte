@@ -6,29 +6,36 @@
     let results: Runeword[] = data.sort((a, b) => a.level - b.level);
     let lastResults = results;
     let searchString = "";
-    let groups = []; //types;
+    let groups = [];
 
     const fuse = new Fuse(data, {
-        keys: ["runeword", "effects", "item", "runes"],
+        keys: ["effects", "item", "runeword", "runes"],
         threshold: 0.2,
         useExtendedSearch: true,
-        shouldSort: true,
+        distance: 100000, // required to find matches in effects because it's so long
+        shouldSort: false,
     });
 
     function search() {
-        lastResults = results;
         if (searchString.length === 0) {
             results = data;
+            lastResults = data;
         } else {
             let resultsNow = searchString;
             setTimeout(() => {
                 if (resultsNow === searchString) {
+                    results = data;
+                    doSearch();
                     regroup();
-                    results = fuse.search(searchString).map((res) => res.item);
                     sort();
                 }
             }, 200);
         }
+    }
+
+    function doSearch() {
+        results = fuse.search(searchString).map((res) => res.item);
+        lastResults = results;
     }
 
     function sort() {
@@ -36,9 +43,7 @@
     }
 
     function regroup() {
-        // if no groups selected, do nothing
         if (groups.length === 0 || groups[0] === "none") results = lastResults;
-
         results = lastResults.filter((rw) => {
             for (let type of groups) if (rw.item.includes(type)) return false;
             return true;
