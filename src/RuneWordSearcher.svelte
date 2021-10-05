@@ -7,7 +7,7 @@
     let lastResults = results;
     let searchString = "";
     let sortBy = 0;
-    let groups = types;
+    let groups = [];//types;
 
     const fuse = new Fuse(data, {
         keys: ["runeword", "effects", "item", "runes"],
@@ -40,14 +40,14 @@
     }
 
     function regroup() {
-        if (groups.length === types.length) // if all groups selected, do nothing
+        if (groups.length === 0) // if no groups selected, do nothing
             return;
 
         results = lastResults.filter((rw) => {
             for (let type of groups)
                 if (rw.item.includes(type))
-                    return true;
-            return false;
+                    return false;
+            return true;
         });
     }
 </script>
@@ -74,7 +74,7 @@
 </div>
 <div id="types">
     <label>
-        Show types:<br />
+        Ignore types:<br />
         <select multiple bind:value={groups} on:change={regroup}>
             {#each types as type}
                 <option value={type}>
