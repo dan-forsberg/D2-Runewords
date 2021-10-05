@@ -40,8 +40,8 @@
     }
 
     function regroup() {
-        if (groups.length === 0) // if no groups selected, do nothing
-            return;
+        if (groups.length === 0 || groups[0] === "none") // if no groups selected, do nothing
+            results = lastResults;
 
         results = lastResults.filter((rw) => {
             for (let type of groups)
@@ -76,6 +76,7 @@
     <label>
         Ignore types:<br />
         <select multiple bind:value={groups} on:change={regroup}>
+            <option value="none" selected>none</option>
             {#each types as type}
                 <option value={type}>
                     {type}
