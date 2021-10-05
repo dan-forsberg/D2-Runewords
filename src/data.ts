@@ -1119,7 +1119,7 @@ const data: Runeword[] = [
 ];
 
 const types: string[] = [
-    "off-hand armor shields",
+    "off-hand armor",
     "shrunken heads",
     "paladin shields",
     "weapons",

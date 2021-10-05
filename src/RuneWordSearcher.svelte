@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { data, Runeword } from "./data";
+    import { data, Runeword, types } from "./data";
     import RuneWord from "./RuneWord.svelte";
     import Fuse from "fuse.js";
 
-    let searchString = "";
     let results: Runeword[] = data.sort((a, b) => a.level - b.level);
-
+    let lastResults = results;
+    let searchString = "";
     let sortBy = 0;
+    let groups = types;
 
     const fuse = new Fuse(data, {
         keys: ["runeword", "effects", "item", "runes"],
@@ -16,15 +17,15 @@
     });
 
     function search() {
+        lastResults = results;
         if (searchString.length === 0) {
             results = data;
         } else {
             const searchStringNow = searchString;
             /* don't start filtering immediately and waste cpu-cycles */
             setTimeout(() => {
-                if (searchStringNow === searchString) {
+                if (searchStringNow === searchString)
                     results = fuse.search(searchString).map((res) => res.item);
-                }
             }, 150);
         }
 
@@ -32,9 +33,22 @@
     }
 
     function reorder() {
-        if (sortBy == 1) {
+        if (sortBy == 1)
             results = results.sort((a, b) => a.level - b.level);
-        }
+        else
+            results = lastResults;
+    }
+
+    function regroup() {
+        if (groups.length === types.length) // if all groups selected, do nothing
+            return;
+
+        results = lastResults.filter((rw) => {
+            for (let type of groups)
+                if (rw.item.includes(type))
+                    return true;
+            return false;
+        });
     }
 </script>
 
@@ -58,7 +72,18 @@
     will find words that includes "fire", "cold" and "resist" in the effects
     <a href="https://fusejs.io/examples.html#extended-search">more info</a>
 </div>
-
+<div id="types">
+    <label>
+        Show types:<br />
+        <select multiple bind:value={groups} on:change={regroup}>
+            {#each types as type}
+                <option value={type}>
+                    {type}
+                </option>
+            {/each}
+        </select>
+    </label>
+</div>
 <hr />
 <div id="results">
     {#each results as runeword}
@@ -67,6 +92,10 @@
 </div>
 
 <style>
+    #types {
+        margin-top: 15px;
+    }
+
     #results {
         display: flex;
         flex-direction: row;
@@ -77,5 +106,14 @@
 
     label {
         display: inline-block;
+    }
+
+    select {
+        background-color: black;
+        color: green;
+    }
+
+    option:checked {
+        background: #444 -webkit-linear-gradient(bottom, #444 0%, #444 100%);
     }
 </style>
