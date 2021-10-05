@@ -6,12 +6,11 @@
     let results: Runeword[] = data.sort((a, b) => a.level - b.level);
     let lastResults = results;
     let searchString = "";
-    let sortBy = 0;
-    let groups = [];//types;
+    let groups = []; //types;
 
     const fuse = new Fuse(data, {
         keys: ["runeword", "effects", "item", "runes"],
-        threshold: 0.5,
+        threshold: 0.2,
         useExtendedSearch: true,
         shouldSort: true,
     });
@@ -21,83 +20,88 @@
         if (searchString.length === 0) {
             results = data;
         } else {
-            const searchStringNow = searchString;
-            /* don't start filtering immediately and waste cpu-cycles */
+            let resultsNow = searchString;
             setTimeout(() => {
-                if (searchStringNow === searchString)
+                if (resultsNow === searchString) {
+                    regroup();
                     results = fuse.search(searchString).map((res) => res.item);
-            }, 150);
+                    sort();
+                }
+            }, 200);
         }
-
-        reorder();
     }
 
-    function reorder() {
-        if (sortBy == 1)
-            results = results.sort((a, b) => a.level - b.level);
-        else
-            results = lastResults;
+    function sort() {
+        results = results.sort((a, b) => a.level - b.level);
     }
 
     function regroup() {
-        if (groups.length === 0 || groups[0] === "none") // if no groups selected, do nothing
-            results = lastResults;
+        // if no groups selected, do nothing
+        if (groups.length === 0 || groups[0] === "none") results = lastResults;
 
         results = lastResults.filter((rw) => {
-            for (let type of groups)
-                if (rw.item.includes(type))
-                    return false;
+            for (let type of groups) if (rw.item.includes(type)) return false;
             return true;
         });
     }
 </script>
 
-<div id="lheader">
-    <label>
-        Search term(s):
-        <input type="text" bind:value={searchString} on:input={search} />
-    </label>
-    <label>
-        Sort by match
-        <input type="radio" bind:group={sortBy} value={0} on:change={reorder} />
-    </label>
-    <label>
-        Sort by level
-        <input type="radio" bind:group={sortBy} value={1} on:change={reorder} />
-    </label>
-</div>
-<div>
-    Prefix terms with ' for, eg
-    <code><em>'fire 'cold 'resist</em></code>
-    will find words that includes "fire", "cold" and "resist" in the effects
-    <a href="https://fusejs.io/examples.html#extended-search">more info</a>
-</div>
-<div id="types">
-    <label>
-        Ignore types:<br />
-        <select multiple bind:value={groups} on:change={regroup}>
-            <option value="none" selected>none</option>
-            {#each types as type}
-                <option value={type}>
-                    {type}
-                </option>
-            {/each}
-        </select>
-    </label>
-</div>
-<hr />
-<div id="results">
-    {#each results as runeword}
-        <RuneWord {runeword} />
-    {/each}
-</div>
+<h1>xXx_RuneWordHelper_xXx</h1>
+<header>
+    <div id="search">
+        <label>
+            Search term(s):
+            <input type="text" bind:value={searchString} on:input={search} />
+        </label>
+        <p>
+            Prefix terms with ' for, eg
+            <code><em>'fire 'cold 'resist</em></code>
+            will find words <br />that includes "fire", "cold" and "resist" in the effects
+            <a href="https://fusejs.io/examples.html#extended-search">more info</a>
+        </p>
+    </div>
+
+    <div id="types">
+        <label>
+            Ignore types:<br />
+
+            <select multiple bind:value={groups} on:change={regroup}>
+                <option value="none" selected>none</option>
+                {#each types as type}
+                    <option value={type}>
+                        {type}
+                    </option>
+                {/each}
+            </select>
+        </label>
+    </div>
+</header>
+
+<main>
+    {#key results}
+        {#each results as runeword}
+            <RuneWord {runeword} highlight={searchString} />
+        {/each}
+    {/key}
+</main>
 
 <style>
-    #types {
-        margin-top: 15px;
+    h1 {
+        text-align: center;
     }
 
-    #results {
+    header {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 14px;
+        display: flex;
+    }
+
+    #search,
+    #types {
+        flex: 1;
+    }
+
+    main {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -106,7 +110,7 @@
     }
 
     label {
-        display: inline-block;
+        margin-top: 0px;
     }
 
     select {
